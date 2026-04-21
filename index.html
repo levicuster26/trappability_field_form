@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Trappability Study Field Sheet</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root {
+    --green-dark: #1a3a2a;
+    --green-mid: #2d5a3d;
+    --green-light: #4a8c5c;
+    --green-pale: #e8f2eb;
+    --green-accent: #6abf7b;
+    --amber: #d4870a;
+    --amber-pale: #fff4e0;
+    --text: #1a2420;
+    --text-muted: #556b60;
+    --border: #c2d8c8;
+    --bg: #f5f9f6;
+    --white: #ffffff;
+    --red: #c0392b;
+    --radius: 10px;
+    --shadow: 0 2px 12px rgba(26,58,42,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Georgia', serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 3rem;
+  }
+
+  header {
+    background: var(--green-dark);
+    color: white;
+    padding: 1.5rem 1.25rem 1.25rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+  }
+
+  header h1 {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1.3;
+    flex: 1;
+  }
+
+  header p {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.05em;
+    margin-top: 3px;
+  }
+
+  .header-badge {
+    background: var(--green-accent);
+    color: var(--green-dark);
+    font-size: 0.65rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 1.25rem;
+  }
+
+  .page-section {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+  }
+
+  .section-header {
+    background: var(--green-mid);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.7rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-header .dot {
+    width: 7px; height: 7px;
+    background: var(--green-accent);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .section-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  input[type="date"],
+  input[type="time"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    font-size: 0.95rem;
+    font-family: 'Georgia', serif;
+    color: var(--text);
+    background: var(--bg);
+    transition: border-color 0.15s, background 0.15s;
+    -webkit-appearance: none;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--green-light);
+    background: #f0f7f2;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .radio-group {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .radio-option {
+    flex: 1;
+    min-width: 90px;
+  }
+
+  .radio-option input[type="radio"] {
+    display: none;
+  }
+
+  .radio-option label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 0.5rem;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-family: 'Georgia', serif;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--text-muted);
+    background: var(--bg);
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .radio-option input[type="radio"]:checked + label {
+    border-color: var(--green-light);
+    background: var(--green-pale);
+    color: var(--green-dark);
+    font-weight: 700;
+  }
+
+  .camera-id-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+  }
+
+  .camera-id-grid input {
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  .acclimatization-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  .acclimatization-table th {
+    background: var(--green-pale);
+    color: var(--green-dark);
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    padding: 0.6rem 0.85rem;
+    text-align: left;
+    border-bottom: 1.5px solid var(--border);
+    font-weight: 700;
+  }
+
+  .acclimatization-table td {
+    padding: 0.6rem 0.85rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .acclimatization-table td:first-child {
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    width: 45%;
+  }
+
+  .acclimatization-table input {
+    padding: 0.45rem 0.7rem;
+    font-size: 0.88rem;
+  }
+
+  .diagram-area {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    min-height: 280px;
+    position: relative;
+    cursor: crosshair;
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  .diagram-area canvas {
+    display: block;
+    width: 100%;
+    height: 280px;
+    touch-action: none;
+  }
+
+  .diagram-hint {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-family: 'Courier New', monospace;
+    opacity: 0.5;
+    pointer-events: none;
+    line-height: 1.7;
+  }
+
+  .diagram-tools {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+  }
+
+  .tool-btn {
+    padding: 0.45rem 0.85rem;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    font-size: 0.75rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-weight: 700;
+    transition: all 0.15s;
+  }
+
+  .tool-btn:hover { background: var(--green-pale); border-color: var(--green-light); color: var(--green-dark); }
+  .tool-btn.active { background: var(--green-mid); border-color: var(--green-mid); color: white; }
+
+  .legend-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 0.6rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: 'Courier New', monospace;
+  }
+
+  .legend-circle { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--green-mid); background: transparent; }
+  .legend-square { width: 14px; height: 14px; border: 2px solid var(--amber); background: transparent; }
+
+  .export-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--green-dark);
+    padding: 0.85rem 1.25rem;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    z-index: 200;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
+  }
+
+  .export-btn {
+    flex: 1;
+    max-width: 200px;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .btn-pdf {
+    background: var(--amber);
+    color: white;
+  }
+  .btn-pdf:hover { background: #b8770a; }
+
+  .btn-excel {
+    background: var(--green-accent);
+    color: var(--green-dark);
+  }
+  .btn-excel:hover { background: #5aaf6b; }
+
+  .btn-icon { font-size: 1rem; }
+
+  .notes-count {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-align: right;
+    font-family: 'Courier New', monospace;
+    margin-top: 4px;
+  }
+
+  .page-indicator {
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    padding: 0.5rem 0;
+  }
+
+  .required-star { color: var(--red); margin-left: 2px; }
+
+  .hint {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-family: 'Courier New', monospace;
+    margin-top: 2px;
+    font-style: italic;
+    font-family: 'Georgia', serif;
+    letter-spacing: 0;
+    font-weight: 400;
+    text-transform: none;
+  }
+
+  .success-toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--green-mid);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 30px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+  }
+
+  .success-toast.show { opacity: 1; }
+
+  @media (max-width: 400px) {
+    .two-col { grid-template-columns: 1fr; }
+    .camera-id-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media print {
+    header, .export-bar { display: none; }
+    .page-section { box-shadow: none; break-inside: avoid; }
+    body { background: white; }
+  }
+</style>
+</head>
+<body>
+
+<div class="success-toast" id="toast">Exported successfully</div>
+
+<header>
+  <div>
+    <h1>Trappability Study<br>Field Sheet</h1>
+    <p>BADGER SURVEY PROTOCOL</p>
+  </div>
+  <div class="header-badge">FIELD USE</div>
+</header>
+
+<div class="container">
+
+  <!-- PAGE 1 -->
+  <div class="page-indicator">— PAGE 1 OF 2 —</div>
+
+  <!-- Recorder -->
+  <div class="page-section">
+    <div class="section-header"><span class="dot"></span>RECORDER DETAILS</div>
+    <div class="section-body">
+      <div class="field-group">
+        <label>Recorder Name <span class="required-star">*</span></label>
+        <input type="text" id="recorder_name" placeholder="Full name" autocomplete="name">
+      </div>
+      <div class="field-group">
+        <label>Sett ID <span class="required-star">*</span></label>
+        <input type="text" id="sett_id" placeholder="e.g. S-042">
+      </div>
+    </div>
+  </div>
+
+  <!-- Dates & Times -->
+  <div class="page-section">
+    <div class="section-header"><span class="dot"></span>DEPLOYMENT DATES & TIMES</div>
+    <div class="section-body">
+      <div class="field-group">
+        <label>Camera Trap Deployment</label>
+        <div class="two-col">
+          <div class="field-group">
+            <label>Date</label>
+            <input type="date" id="deploy_date">
+          </div>
+          <div class="field-group">
+            <label>Time</label>
+            <input type="text" id="deploy_time" placeholder="e.g. 14:30" maxlength="5" style="font-family:'Courier New',monospace; font-weight:700; letter-spacing:0.05em;">
+          </div>
+        </div>
+      </div>
+      <div class="field-group">
+        <label>Camera Trap Retrieval</label>
+        <div class="two-col">
+          <div class="field-group">
+            <label>Date</label>
+            <input type="date" id="retrieval_date">
+          </div>
+          <div class="field-group">
+            <label>Time</label>
+            <input type="text" id="retrieval_time" placeholder="e.g. 14:30" maxlength="5" style="font-family:'Courier New',monospace; font-weight:700; letter-spacing:0.05em;">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Equipment -->
+  <div class="page-section">
+    <div class="section-header"><span class="dot"></span>EQUIPMENT DEPLOYED</div>
+    <div class="section-body">
+      <div class="two-col">
+        <div class="field-group">
+          <label>No. of Restraints</label>
+          <input type="number" id="num_restraints" placeholder="0" min="0">
+        </div>
+        <div class="field-group">
+          <label>No. of Cages</label>
+          <input type="number" id="num_cages" placeholder="0" min="0">
+        </div>
+      </div>
+      <div class="field-group">
+        <label>No. of Camera Traps</label>
+        <select id="num_cameras" onchange="updateCameraIDs()">
+          <option value="">— Select —</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+        </select>
+      </div>
+      <div class="field-group" id="cam_ids_group" style="display:none;">
+        <label>Camera Trap IDs <span class="hint">(must match SD card labels)</span></label>
+        <div class="camera-id-grid" id="camera-id-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Burrows -->
+  <div class="page-section">
+    <div class="section-header"><span class="dot"></span>BURROW INFORMATION</div>
+    <div class="section-body">
+      <div class="field-group">
+        <label>Approximate No. of Active Burrows</label>
+        <input type="number" id="num_burrows" placeholder="0" min="0">
+      </div>
+      <div class="field-group">
+        <label>All active burrows in camera field of view?</label>
+        <div class="radio-group">
+          <div class="radio-option">
+            <input type="radio" name="burrows_in_fov" id="fov_yes" value="YES">
+            <label for="fov_yes">YES</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" name="burrows_in_fov" id="fov_no" value="NO">
+            <label for="fov_no">NO</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" name="burrows_in_fov" id="fov_partial" value="PARTIAL">
+            <label for="fov_partial">PARTIAL</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acclimatization -->
+  <div class="page-section">
+    <div class="section-header"><span class="dot"></span>ACCLIMATIZATION</div>
+    <div class="section-body">
+      <div class="field-group">
+        <label>Cameras deployed early for acclimatization?</label>
+        <div class="radio-group">
+          <div class="radio-option">
+            <input type="radio" name="acclimatization" id="acc_yes" value="YES" onchange="toggleAcclimSection(true)">
+            <label for="acc_yes">YES</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" name="acclimatization" id="acc_no" value="NO" onchange="toggleAcclimSection(false)">
+            <label for="acc_no">NO</label>
+          </div>
+        </div>
+      </div>
+
+      <div id="acclim_details" style="display:none; flex-direction:column; gap:0.75rem;">
+        <div class="field-group">
+          <label>Timeline / Notes</label>
+          <textarea id="acclimatization_notes" placeholder="Describe the acclimatization timeline…" rows="3"></textarea>
+        </div>
+        <table class="acclimatization-table">
+          <thead>
+            <tr>
+              <th>Equipment</th>
+              <th>Date of Deployment for Acclimatization</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Camera Traps</td>
+              <td><input type="date" id="acclim_camera_date"></td>
+            </tr>
+            <tr>
+              <td>Restraints / Cage</td>
+              <td><input type="date" id="acclim_restraint_date"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 2 -->
+  <div class="page-indicator">— PAGE 2 OF 2 —</div>
+
+  <!-- Diagram -->
+  <div class="page-section">
+    <div class="section-header"><span class="dot"></span>SETT DIAGRAM</div>
+    <div class="section-body">
+      <p class="hint" style="font-style:italic; font-size:0.8rem; color:var(--text-muted); margin-bottom:0.5rem;">
+        Draw a rough diagram of the sett and labelled camera positions. Use the same camera IDs noted above. Indicate approximate field of vision.
+      </p>
+      <div class="diagram-tools">
+        <button class="tool-btn active" id="tool_pen" onclick="setTool('pen')">✏ PEN</button>
+        <button class="tool-btn" id="tool_burrow" onclick="setTool('burrow')">○ BURROW</button>
+        <button class="tool-btn" id="tool_camera" onclick="setTool('camera')">□ CAMERA</button>
+        <button class="tool-btn" onclick="clearDiagram()">✕ CLEAR</button>
+      </div>
+      <div class="diagram-area">
+        <canvas id="diagramCanvas" width="600" height="280"></canvas>
+        <div class="diagram-hint" id="diagramHint">Tap / click to draw<br>Use tools above to add<br>burrows (○) and cameras (□)</div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-circle"></div> Active burrow</div>
+        <div class="legend-item"><div class="legend-square"></div> Camera trap</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Additional Notes -->
+  <div class="page-section">
+    <div class="section-header"><span class="dot"></span>ADDITIONAL NOTES</div>
+    <div class="section-body">
+      <div class="field-group">
+        <textarea id="additional_notes" placeholder="Any additional observations, conditions, or notes…" rows="4" oninput="updateCount(this, 'notes_count')"></textarea>
+        <div class="notes-count" id="notes_count">0 characters</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height: 5rem;"></div>
+</div>
+
+<!-- Export bar -->
+<div class="export-bar">
+  <button class="export-btn btn-pdf" onclick="exportPDF()">
+    <span class="btn-icon">⬇</span> SAVE PDF
+  </button>
+  <button class="export-btn btn-excel" onclick="exportExcel()">
+    <span class="btn-icon">⬇</span> SAVE EXCEL
+  </button>
+</div>
+
+<script>
+// ── Acclimatization toggle ──
+function toggleAcclimSection(show) {
+  const el = document.getElementById('acclim_details');
+  el.style.display = show ? 'flex' : 'none';
+}
+
+// ── Dynamic camera ID boxes ──
+function updateCameraIDs() {
+  const n = parseInt(document.getElementById('num_cameras').value) || 0;
+  const grid = document.getElementById('camera-id-grid');
+  const group = document.getElementById('cam_ids_group');
+  grid.innerHTML = '';
+  if (n === 0) { group.style.display = 'none'; return; }
+  group.style.display = '';
+  for (let i = 1; i <= n; i++) {
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.id = 'cam_id_' + i;
+    inp.placeholder = 'ID ' + i;
+    inp.style.cssText = 'text-align:center; font-family:"Courier New"; font-weight:700;';
+    grid.appendChild(inp);
+  }
+}
+
+// ── Character count ──
+function updateCount(el, countId) {
+  document.getElementById(countId).textContent = el.value.length + ' characters';
+}
+
+// ── Canvas diagram ──
+const canvas = document.getElementById('diagramCanvas');
+const ctx = canvas.getContext('2d');
+let drawing = false;
+let currentTool = 'pen';
+let hasDiagramContent = false;
+
+function resizeCanvas() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const w = Math.floor(rect.width);
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  canvas.width = w;
+  canvas.height = 280;
+  ctx.putImageData(imageData, 0, 0);
+  ctx.strokeStyle = '#1a3a2a';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function setTool(t) {
+  currentTool = t;
+  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tool_' + t)?.classList.add('active');
+}
+
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const src = e.touches ? e.touches[0] : e;
+  return {
+    x: (src.clientX - rect.left) * scaleX,
+    y: (src.clientY - rect.top) * scaleY
+  };
+}
+
+function drawShape(x, y) {
+  if (currentTool === 'burrow') {
+    ctx.strokeStyle = '#2d5a3d';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x, y, 14, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.strokeStyle = '#1a3a2a';
+  } else if (currentTool === 'camera') {
+    ctx.strokeStyle = '#d4870a';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x - 12, y - 12, 24, 24);
+    ctx.strokeStyle = '#1a3a2a';
+  }
+  hasDiagramContent = true;
+  document.getElementById('diagramHint').style.display = 'none';
+}
+
+canvas.addEventListener('mousedown', e => {
+  const pos = getPos(e);
+  if (currentTool === 'pen') {
+    drawing = true;
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+    ctx.strokeStyle = '#1a3a2a';
+    ctx.lineWidth = 2;
+    hasDiagramContent = true;
+    document.getElementById('diagramHint').style.display = 'none';
+  } else {
+    drawShape(pos.x, pos.y);
+  }
+});
+
+canvas.addEventListener('mousemove', e => {
+  if (!drawing || currentTool !== 'pen') return;
+  const pos = getPos(e);
+  ctx.lineTo(pos.x, pos.y);
+  ctx.stroke();
+});
+
+canvas.addEventListener('mouseup', () => { drawing = false; });
+canvas.addEventListener('mouseleave', () => { drawing = false; });
+
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const pos = getPos(e);
+  if (currentTool === 'pen') {
+    drawing = true;
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+    ctx.strokeStyle = '#1a3a2a';
+    ctx.lineWidth = 2.5;
+    hasDiagramContent = true;
+    document.getElementById('diagramHint').style.display = 'none';
+  } else {
+    drawShape(pos.x, pos.y);
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (!drawing || currentTool !== 'pen') return;
+  const pos = getPos(e);
+  ctx.lineTo(pos.x, pos.y);
+  ctx.stroke();
+}, { passive: false });
+
+canvas.addEventListener('touchend', () => { drawing = false; });
+
+function clearDiagram() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  hasDiagramContent = false;
+  document.getElementById('diagramHint').style.display = '';
+}
+
+// ── Gather form data ──
+function getFormData() {
+  const fov = document.querySelector('input[name="burrows_in_fov"]:checked');
+  const acc = document.querySelector('input[name="acclimatization"]:checked');
+  return {
+    recorder_name: document.getElementById('recorder_name').value || '—',
+    sett_id: document.getElementById('sett_id').value || '—',
+    deploy_date: document.getElementById('deploy_date').value || '—',
+    deploy_time: document.getElementById('deploy_time').value || '—',
+    retrieval_date: document.getElementById('retrieval_date').value || '—',
+    retrieval_time: document.getElementById('retrieval_time').value || '—',
+    num_restraints: document.getElementById('num_restraints').value || '—',
+    num_cages: document.getElementById('num_cages').value || '—',
+    num_cameras: document.getElementById('num_cameras').value || '—',
+    cam_ids: (() => {
+      const n = parseInt(document.getElementById('num_cameras').value) || 0;
+      const ids = [];
+      for (let i = 1; i <= n; i++) {
+        const el = document.getElementById('cam_id_' + i);
+        if (el && el.value) ids.push(el.value);
+      }
+      return ids.length ? ids.join(', ') : '—';
+    })(),
+    num_burrows: document.getElementById('num_burrows').value || '—',
+    burrows_in_fov: fov ? fov.value : '—',
+    acclimatization: acc ? acc.value : '—',
+    acclimatization_notes: document.getElementById('acclimatization_notes').value || '—',
+    acclim_camera_date: document.getElementById('acclim_camera_date').value || '—',
+    acclim_restraint_date: document.getElementById('acclim_restraint_date').value || '—',
+    additional_notes: document.getElementById('additional_notes').value || '—',
+  };
+}
+
+// ── Toast ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── PDF Export ──
+async function exportPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const d = getFormData();
+
+  const GREEN = [26, 58, 42];
+  const GREEN_MID = [45, 90, 61];
+  const AMBER = [212, 135, 10];
+  const pageW = 210;
+  const margin = 16;
+  const col = pageW - margin * 2;
+
+  function sectionHeader(y, title) {
+    doc.setFillColor(...GREEN_MID);
+    doc.roundedRect(margin, y, col, 8, 2, 2, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(7.5);
+    doc.setFont('courier', 'bold');
+    doc.text(title, margin + 4, y + 5.5);
+    return y + 12;
+  }
+
+  function field(y, label, value, x = margin, w = col) {
+    doc.setTextColor(...GREEN);
+    doc.setFontSize(7);
+    doc.setFont('courier', 'bold');
+    doc.text(label.toUpperCase(), x, y);
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(String(value), x, y + 5.5);
+    doc.setDrawColor(194, 216, 200);
+    doc.setLineWidth(0.3);
+    doc.line(x, y + 7, x + w, y + 7);
+    return y + 11;
+  }
+
+  function twoField(y, l1, v1, l2, v2) {
+    const half = (col - 6) / 2;
+    field(y, l1, v1, margin, half);
+    field(y, l2, v2, margin + half + 6, half);
+    return y + 11;
+  }
+
+  let y = margin;
+
+  // Header
+  doc.setFillColor(...GREEN);
+  doc.rect(0, 0, 210, 22, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(13);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Trappability Study Field Sheet', margin, 10);
+  doc.setFontSize(8);
+  doc.setFont('courier', 'normal');
+  doc.text('BADGER SURVEY PROTOCOL', margin, 16);
+  doc.setFontSize(7.5);
+  doc.text('Generated: ' + new Date().toLocaleDateString('en-IE'), 170, 16);
+
+  y = 28;
+
+  // Page 1 label
+  doc.setTextColor(...GREEN_MID);
+  doc.setFontSize(7.5);
+  doc.setFont('courier', 'bold');
+  doc.text('— PAGE 1 OF 2 —', pageW / 2, y, { align: 'center' });
+  y += 6;
+
+  y = sectionHeader(y, 'RECORDER DETAILS');
+  y = twoField(y, 'Recorder Name', d.recorder_name, 'Sett ID', d.sett_id);
+
+  y = sectionHeader(y + 2, 'DEPLOYMENT DATES & TIMES');
+  y = twoField(y, 'Deployment Date', d.deploy_date, 'Deployment Time', d.deploy_time);
+  y = twoField(y, 'Retrieval Date', d.retrieval_date, 'Retrieval Time', d.retrieval_time);
+
+  y = sectionHeader(y + 2, 'EQUIPMENT DEPLOYED');
+  y = twoField(y, 'No. of Restraints', d.num_restraints, 'No. of Cages', d.num_cages);
+  y = twoField(y, 'No. of Camera Traps', d.num_cameras, 'Camera Trap IDs', d.cam_ids);
+
+  y = sectionHeader(y + 2, 'BURROW INFORMATION');
+  y = twoField(y, 'No. of Active Burrows', d.num_burrows, 'All Burrows in FOV?', d.burrows_in_fov);
+
+  y = sectionHeader(y + 2, 'ACCLIMATIZATION');
+  y = field(y, 'Early Deployment for Acclimatization?', d.acclimatization);
+  if (d.acclimatization === 'YES') {
+    y = twoField(y, 'Camera Traps Acclimatization Date', d.acclim_camera_date, 'Restraints/Cage Acclimatization Date', d.acclim_restraint_date);
+    y = field(y, 'Acclimatization Notes', d.acclimatization_notes);
+  }
+
+  // Page 2
+  doc.addPage();
+  y = margin;
+
+  doc.setFillColor(...GREEN);
+  doc.rect(0, 0, 210, 10, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(8);
+  doc.setFont('courier', 'bold');
+  doc.text('Trappability Study Field Sheet  ·  Badger Survey Protocol', margin, 7);
+
+  y = 16;
+  doc.setTextColor(...GREEN_MID);
+  doc.setFontSize(7.5);
+  doc.text('— PAGE 2 OF 2 —', pageW / 2, y, { align: 'center' });
+  y += 6;
+
+  y = sectionHeader(y, 'SETT DIAGRAM');
+  doc.setTextColor(80, 100, 85);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'italic');
+  doc.text('Draw a rough diagram of the sett and labelled camera positions around it. ', margin, y);
+  doc.text('Indicate approximate field of vision. Draw burrows as circles, cameras as squares. Note the diagram will only appear on the PDF download. Please email both PDF and Excel forms.', margin, y + 5);
+  y += 10;
+
+  if (hasDiagramContent) {
+    const imgData = canvas.toDataURL('image/png');
+    const imgH = 70;
+    doc.addImage(imgData, 'PNG', margin, y, col, imgH);
+    y += imgH + 4;
+  } else {
+    doc.setDrawColor(194, 216, 200);
+    doc.setLineWidth(0.4);
+    doc.setLineDashPattern([2, 2], 0);
+    doc.roundedRect(margin, y, col, 75, 3, 3);
+    doc.setLineDashPattern([], 0);
+    doc.setTextColor(160, 180, 165);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text('[No diagram drawn]', pageW / 2, y + 38, { align: 'center' });
+    y += 79;
+  }
+
+  // Legend
+  doc.setTextColor(...GREEN);
+  doc.setFontSize(7.5);
+  doc.setFont('courier', 'bold');
+  doc.circle(margin + 5, y + 3, 3);
+  doc.text('Active burrow', margin + 11, y + 4.5);
+  doc.setDrawColor(...AMBER);
+  doc.rect(margin + 50, y + 0.5, 7, 5);
+  doc.setDrawColor(...GREEN);
+  doc.text('Camera trap', margin + 60, y + 4.5);
+  y += 10;
+
+  y = sectionHeader(y + 2, 'ADDITIONAL NOTES');
+  doc.setTextColor(30, 30, 30);
+  doc.setFontSize(9.5);
+  doc.setFont('helvetica', 'normal');
+  const lines = doc.splitTextToSize(d.additional_notes, col);
+  doc.text(lines, margin, y);
+  y += lines.length * 5 + 4;
+
+  // Footer
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFillColor(240, 245, 241);
+    doc.rect(0, 284, 210, 13, 'F');
+    doc.setTextColor(100, 130, 110);
+    doc.setFontSize(7);
+    doc.setFont('courier', 'normal');
+    doc.text('Trappability Study Field Sheet  ·  Sett ID: ' + d.sett_id, margin, 291);
+    doc.text('Page ' + i + ' of ' + pageCount, pageW - margin, 291, { align: 'right' });
+  }
+
+  const filename = 'Trappability_' + (d.sett_id !== '—' ? d.sett_id + '_' : '') + (d.deploy_date !== '—' ? d.deploy_date : 'draft') + '.pdf';
+  doc.save(filename);
+  showToast('PDF saved: ' + filename);
+}
+
+// ── Excel Export ──
+function exportExcel() {
+  const d = getFormData();
+
+  const rows = [
+    ['Trappability Study Field Sheet', '', '', ''],
+    ['Generated', new Date().toLocaleDateString('en-IE'), '', ''],
+    ['', '', '', ''],
+    ['FIELD', 'VALUE', '', ''],
+    ['Recorder Name', d.recorder_name],
+    ['Sett ID', d.sett_id],
+    ['Deployment Date', d.deploy_date],
+    ['Deployment Time', d.deploy_time],
+    ['Retrieval Date', d.retrieval_date],
+    ['Retrieval Time', d.retrieval_time],
+    ['No. of Restraints', d.num_restraints],
+    ['No. of Cages', d.num_cages],
+    ['No. of Camera Traps', d.num_cameras],
+    ['Camera Trap IDs', d.cam_ids],
+    ['No. of Active Burrows', d.num_burrows],
+    ['All Burrows in Camera FOV?', d.burrows_in_fov],
+    ['Early Acclimatization?', d.acclimatization],
+    ['Acclimatization Notes', d.acclimatization_notes],
+    ['Camera Traps Acclimatization Date', d.acclim_camera_date],
+    ['Restraints/Cage Acclimatization Date', d.acclim_restraint_date],
+    ['Additional Notes', d.additional_notes],
+    ['Diagram', hasDiagramContent ? 'Diagram drawn (see PDF export)' : 'No diagram'],
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+
+  ws['!cols'] = [{ wch: 38 }, { wch: 50 }];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Field Sheet');
+
+  const filename = 'Trappability_' + (d.sett_id !== '—' ? d.sett_id + '_' : '') + (d.deploy_date !== '—' ? d.deploy_date : 'draft') + '.xlsx';
+  XLSX.writeFile(wb, filename);
+  showToast('Excel saved: ' + filename);
+}
+</script>
+</body>
+</html>
